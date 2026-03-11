@@ -1,0 +1,33 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <table>
+        {% for field in form %}
+            <tr>
+                <th>{{ field.label_tag }}</th>
+                <td>
+                    {{ field }}
+                    {% if field.help_text %}
+                        <p class="help">{{ field.help_text }}</p>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <button type="submit">Отправить</button>
+</form>
+{% endblock %}

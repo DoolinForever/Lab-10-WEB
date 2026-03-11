@@ -1,0 +1,14 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<h2>Добавить артиста</h2>
+{% if success_message %}
+    <div class="alert">{{ success_message }}</div>
+{% endif %}
+<form method="post">
+    {% csrf_token %}
+    <label for="artist-name">Имя исполнителя</label>
+    <input id="artist-name" type="text" name="name" value="{{ submitted_name }}">
+    <button type="submit">Отправить</button>
+</form>
+{% endblock %}

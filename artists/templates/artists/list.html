@@ -1,0 +1,12 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<h2>Артисты</h2>
+<ul>
+    {% for artist in artists %}
+        <li>{{ artist }}</li>
+    {% empty %}
+        <li>Артисты не найдены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

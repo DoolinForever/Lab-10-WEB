@@ -1,0 +1,78 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<h2>Демонстрация ORM для треков</h2>
+
+<section>
+    <h3>Q-выражение</h3>
+    <p>Опубликованные треки длиннее 300 секунд или с тегом «Live».</p>
+    <ul>
+        {% for track in q_results %}
+            <li>{{ track.title }} — {{ track.genre__name }} ({{ track.duration }} сек)</li>
+        {% empty %}
+            <li>Нет подходящих треков.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section>
+    <h3>F-выражение</h3>
+    {% if f_result %}
+        <p>Временный трек «{{ f_result.title }}» получил +1 прослушивание. Текущий play_count: {{ f_result.play_count }}.</p>
+        <p>После демонстрации запись удалена из базы.</p>
+    {% else %}
+        <p>Нет жанров для создания временного трека.</p>
+    {% endif %}
+</section>
+
+<section>
+    <h3>Value</h3>
+    <p>Каждому треку добавлен неизменяемый ярлык «Каталог» через Value.</p>
+    <ul>
+        {% for sample in value_samples %}
+            <li>{{ sample.title }} — {{ sample.source_label }}</li>
+        {% empty %}
+            <li>Нет данных.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section>
+    <h3>Annotate (количество тегов)</h3>
+    <ul>
+        {% for item in tag_counts %}
+            <li>{{ item.title }} — тегов: {{ item.tag_total }}</li>
+        {% empty %}
+            <li>Нет данных.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section>
+    <h3>Aggregate</h3>
+    <p>Суммарная длительность: {{ track_stats.total_duration|default:'0' }} сек.</p>
+    <p>Средняя длительность: {{ track_stats.avg_duration|floatformat:2|default:'0' }} сек.</p>
+</section>
+
+<section>
+    <h3>Группировка по жанрам</h3>
+    <ul>
+        {% for group in genre_groups %}
+            <li>{{ group.genre__name|default:'Без жанра' }} — треков: {{ group.track_count }}</li>
+        {% empty %}
+            <li>Нет данных.</li>
+        {% endfor %}
+    </ul>
+</section>
+
+<section>
+    <h3>Вычисляемое поле (длительность в минутах)</h3>
+    <ul>
+        {% for item in duration_minutes %}
+            <li>{{ item.title }} — {{ item.duration }} сек ≈ {{ item.duration_minutes|floatformat:2 }} мин</li>
+        {% empty %}
+            <li>Нет данных.</li>
+        {% endfor %}
+    </ul>
+</section>
+{% endblock %}

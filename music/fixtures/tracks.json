@@ -1,0 +1,110 @@
+[
+  {
+    "model": "music.tag",
+    "pk": 1,
+    "fields": {
+      "name": "Live",
+      "slug": "live"
+    }
+  },
+  {
+    "model": "music.tag",
+    "pk": 2,
+    "fields": {
+      "name": "Acoustic",
+      "slug": "acoustic"
+    }
+  },
+  {
+    "model": "music.tag",
+    "pk": 3,
+    "fields": {
+      "name": "Instrumental",
+      "slug": "instrumental"
+    }
+  },
+  {
+    "model": "music.tag",
+    "pk": 4,
+    "fields": {
+      "name": "Classic",
+      "slug": "classic"
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 1,
+    "fields": {
+      "title": "Bohemian Rhapsody",
+      "slug": "bohemian-rhapsody",
+      "duration": 355,
+      "release_year": 1975,
+      "play_count": 1250000,
+      "is_published": true,
+      "genre": 1,
+      "tags": [1, 4]
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 2,
+    "fields": {
+      "title": "Nothing Else Matters",
+      "slug": "nothing-else-matters",
+      "duration": 388,
+      "release_year": 1991,
+      "play_count": 980000,
+      "is_published": true,
+      "genre": 4,
+      "tags": [2]
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 3,
+    "fields": {
+      "title": "Take Five",
+      "slug": "take-five",
+      "duration": 330,
+      "release_year": 1959,
+      "play_count": 450000,
+      "is_published": true,
+      "genre": 3,
+      "tags": [3]
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 4,
+    "fields": {
+      "title": "Shape of You",
+      "slug": "shape-of-you",
+      "duration": 263,
+      "release_year": 2017,
+      "play_count": 2100000,
+      "is_published": true,
+      "genre": 2,
+      "tags": [1, 2]
+    }
+  },
+  {
+    "model": "music.trackdetails",
+    "pk": 1,
+    "fields": {
+      "track": 1,
+      "lyrics_author": "Freddie Mercury",
+      "bpm": 144,
+      "has_video": true
+    }
+  },
+  {
+    "model": "music.trackdetails",
+    "pk": 2,
+    "fields": {
+      "track": 3,
+      "lyrics_author": "Paul Desmond",
+      "bpm": 174,
+      "has_video": false
+    }
+  }
+]

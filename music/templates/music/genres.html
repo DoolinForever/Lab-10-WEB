@@ -1,0 +1,18 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<h2>Жанры каталога</h2>
+<ul>
+    {% for genre in genres %}
+        <li>
+            <strong>{{ genre.name }}</strong>
+            <div>
+                <a href="{% url 'genre_by_id' genre.id %}">Открыть по ID</a>
+                <a href="{% url 'genre_by_slug' genre.slug %}">Открыть по слагу</a>
+            </div>
+        </li>
+    {% empty %}
+        <li>Жанры пока не добавлены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,13 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<h2>Поиск по каталогу</h2>
+<form method="get">
+    <label for="search-query">Введите запрос</label>
+    <input id="search-query" type="search" name="q" value="{{ query }}">
+    <button type="submit">Искать</button>
+</form>
+{% if message %}
+    <div class="alert">{{ message }}</div>
+{% endif %}
+{% endblock %}

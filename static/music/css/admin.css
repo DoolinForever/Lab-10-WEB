@@ -1,0 +1,23 @@
+﻿:root {
+    --admin-accent: #1f5cb8;
+    --admin-accent-light: #e7f1ff;
+}
+
+#header {
+    background-color: var(--admin-accent);
+}
+
+#header .branding h1,
+#header .branding h1 a:link,
+#header .branding h1 a:visited {
+    color: #fff;
+}
+
+a:link, a:visited {
+    color: var(--admin-accent);
+}
+
+.module caption {
+    background-color: var(--admin-accent-light);
+    color: #1f1f1f;
+}

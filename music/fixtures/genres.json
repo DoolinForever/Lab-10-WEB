@@ -1,0 +1,46 @@
+[
+  {
+    "model": "music.genre",
+    "pk": 1,
+    "fields": {
+      "name": "Rock",
+      "slug": "rock",
+      "audience": "general",
+      "is_published": true,
+      "created_at": "2026-03-01T10:00:00Z"
+    }
+  },
+  {
+    "model": "music.genre",
+    "pk": 2,
+    "fields": {
+      "name": "Pop",
+      "slug": "pop",
+      "audience": "general",
+      "is_published": true,
+      "created_at": "2026-03-02T10:00:00Z"
+    }
+  },
+  {
+    "model": "music.genre",
+    "pk": 3,
+    "fields": {
+      "name": "Jazz",
+      "slug": "jazz",
+      "audience": "adults",
+      "is_published": true,
+      "created_at": "2026-03-03T10:00:00Z"
+    }
+  },
+  {
+    "model": "music.genre",
+    "pk": 4,
+    "fields": {
+      "name": "Metal",
+      "slug": "metal",
+      "audience": "adults",
+      "is_published": true,
+      "created_at": "2026-03-04T10:00:00Z"
+    }
+  }
+]

@@ -1,0 +1,9 @@
+﻿<nav>
+    <ul>
+        {% for item in menu %}
+            <li><a href="{% url item.url_name %}">{{ item.title }}</a></li>
+        {% empty %}
+            <li>Навигация недоступна</li>
+        {% endfor %}
+    </ul>
+</nav>

@@ -1,0 +1,12 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<h2>Альбомы</h2>
+<ul>
+    {% for album in albums %}
+        <li>{{ album }}</li>
+    {% empty %}
+        <li>Альбомы пока не добавлены.</li>
+    {% endfor %}
+</ul>
+{% endblock %}

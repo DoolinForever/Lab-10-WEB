@@ -1,0 +1,11 @@
+﻿{% extends 'base.html' %}
+{% load music_tags %}
+
+{% block content %}
+{% get_music_sections_count as sections_count %}
+<p>{{ description|capfirst }} Сейчас доступно {{ sections_count }} основных разделов.</p>
+<section>
+    <h2>Разделы каталога</h2>
+    {% show_music_sections %}
+</section>
+{% endblock %}

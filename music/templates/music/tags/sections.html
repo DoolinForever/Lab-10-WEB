@@ -1,0 +1,11 @@
+﻿<ul class="sections-list">
+    {% for section in sections %}
+        <li>
+            <strong>{{ section.title|capfirst }}</strong>
+            <p>{{ section.description|truncatewords:12 }}</p>
+            <a href="{% url section.url_name %}">Перейти</a>
+        </li>
+    {% empty %}
+        <li>Разделы каталога пока недоступны.</li>
+    {% endfor %}
+</ul>
