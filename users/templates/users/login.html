@@ -1,0 +1,29 @@
+﻿{% extends 'base.html' %}
+{% block content %}
+<h2>Войти</h2>
+<form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    <table>
+        {% for field in form %}
+            <tr>
+                <th>
+                    {% if field.name == 'username' %}
+                        <label for="{{ field.id_for_label }}">E-mail или имя пользователя</label>
+                    {% else %}
+                        {{ field.label_tag }}
+                    {% endif %}
+                </th>
+                <td>
+                    {{ field }}
+                    {% for error in field.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+    <button type="submit">Войти</button>
+</form>
+<p><a href="{% url 'password_reset' %}">Забыли пароль?</a></p>
+{% endblock %}

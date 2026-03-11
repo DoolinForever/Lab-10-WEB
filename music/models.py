@@ -70,6 +70,9 @@ class Track(models.Model):
         ordering = ['-release_year', 'title']
         verbose_name = 'трек'
         verbose_name_plural = 'треки'
+        permissions = [
+            ('can_publish_track', 'Can publish track'),
+        ]
 
     def __str__(self):
         return self.title

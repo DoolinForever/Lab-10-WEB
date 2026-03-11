@@ -1,4 +1,5 @@
 ﻿from django.contrib import messages
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.db.models import Avg, CharField, Count, ExpressionWrapper, F, FloatField, Q, Sum, Value
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
@@ -137,12 +138,13 @@ class TrackDetailView(MusicMenuMixin, DetailView):
         return Track.objects.select_related('genre').prefetch_related('tags')
 
 
-class TrackCreateView(MusicMenuMixin, CreateView):
+class TrackCreateView(LoginRequiredMixin, PermissionRequiredMixin, MusicMenuMixin, CreateView):
     template_name = 'music/track_form.html'
     form_class = TrackForm
     model = Track
     success_url = reverse_lazy('tracks_list')
     page_title = 'Добавить трек'
+    permission_required = 'music.can_publish_track'
 
     def form_valid(self, form):
         response = super().form_valid(form)
@@ -154,7 +156,7 @@ class TrackCreateView(MusicMenuMixin, CreateView):
         return super().form_invalid(form)
 
 
-class TrackUpdateView(MusicMenuMixin, UpdateView):
+class TrackUpdateView(LoginRequiredMixin, PermissionRequiredMixin, MusicMenuMixin, UpdateView):
     template_name = 'music/track_form.html'
     form_class = TrackForm
     model = Track
@@ -162,6 +164,7 @@ class TrackUpdateView(MusicMenuMixin, UpdateView):
     slug_url_kwarg = 'slug'
     success_url = reverse_lazy('tracks_list')
     page_title = 'Редактировать трек'
+    permission_required = 'music.change_track'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -178,13 +181,14 @@ class TrackUpdateView(MusicMenuMixin, UpdateView):
         return super().form_invalid(form)
 
 
-class TrackDeleteView(MusicMenuMixin, DeleteView):
+class TrackDeleteView(LoginRequiredMixin, PermissionRequiredMixin, MusicMenuMixin, DeleteView):
     model = Track
     template_name = 'music/track_confirm_delete.html'
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
     success_url = reverse_lazy('tracks_list')
     page_title = 'Удалить трек'
+    permission_required = 'music.delete_track'
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -368,4 +372,5 @@ def add_artist(request):
 def old_genres(request):
     genres_url = reverse('genres_list')
     return redirect(genres_url)
+
 
