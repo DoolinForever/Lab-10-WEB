@@ -75,4 +75,16 @@
         {% endfor %}
     </ul>
 </section>
+
+<section>
+    <h3>Методы выборки</h3>
+    {% if selection_examples.first_track %}
+        <p>Первый трек (по названию): {{ selection_examples.first_track.title }}</p>
+    {% endif %}
+    {% if selection_examples.last_track %}
+        <p>Последний трек (по названию): {{ selection_examples.last_track.title }}</p>
+    {% endif %}
+    <p>Всего треков: {{ selection_examples.total_tracks }}</p>
+    <p>Есть неопубликованные треки: {{ selection_examples.has_unpublished|yesno:"да,нет" }}</p>
+</section>
 {% endblock %}

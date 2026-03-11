@@ -8,7 +8,7 @@
             {% if track.image %}
                 <img src="{{ track.image.url }}" alt="{{ track.title }}" style="max-width:200px;height:auto;border-radius:4px;">
             {% endif %}
-            <h3>{{ track.title }}</h3>
+            <h3><a href="{% url 'track_detail' track.slug %}">{{ track.title }}</a></h3>
             <p>Жанр: {{ track.genre.name }}</p>
             <p>Длительность: {{ track.duration }} сек • Год: {{ track.release_year }}</p>
             <div>
@@ -26,4 +26,23 @@
         <li>Пока нет опубликованных треков.</li>
     {% endfor %}
 </ul>
+{% if is_paginated %}
+<nav class="pagination">
+    {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}">← Предыдущая</a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+        {% if num >= page_obj.number|add:'-2' and num <= page_obj.number|add:'2' %}
+            {% if num == page_obj.number %}
+                <span class="current">{{ num }}</span>
+            {% else %}
+                <a href="?page={{ num }}">{{ num }}</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}">Следующая →</a>
+    {% endif %}
+</nav>
+{% endif %}
 {% endblock %}

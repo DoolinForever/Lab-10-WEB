@@ -1,0 +1,23 @@
+﻿{% extends 'base.html' %}
+
+{% block content %}
+<article class="track-detail">
+    <h2>{{ track.title }}</h2>
+    {% if track.image %}
+        <img src="{{ track.image.url }}" alt="{{ track.title }}" style="max-width:320px;height:auto;border-radius:4px;">
+    {% endif %}
+    <p>Жанр: {{ track.genre.name }}</p>
+    <p>Длительность: {{ track.duration }} сек • Год: {{ track.release_year }}</p>
+    <p>Прослушиваний: {{ track.play_count }}</p>
+    <section>
+        <strong>Теги:</strong>
+        <ul>
+            {% for tag in track.tags.all %}
+                <li>{{ tag.name }}</li>
+            {% empty %}
+                <li>Без тегов</li>
+            {% endfor %}
+        </ul>
+    </section>
+</article>
+{% endblock %}

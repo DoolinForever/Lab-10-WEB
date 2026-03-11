@@ -2,7 +2,9 @@
 from django.db.models import Avg, CharField, Count, ExpressionWrapper, F, FloatField, Q, Sum, Value
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
-from django.urls import reverse
+from django.urls import reverse, reverse_lazy
+from django.views import View
+from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, TemplateView, UpdateView
 
 from .forms import TrackForm, TrackSuggestionForm
 from .models import Genre, GenreAudience, Track
@@ -48,14 +50,32 @@ SECTIONS = [
 ]
 
 
-def index(request):
-    context = {
-        'title': 'Музыкальный каталог',
-        'menu': MENU,
-        'description': 'Добро пожаловать в демо-каталог музыки. Выберите раздел, чтобы продолжить.',
-        'sections': SECTIONS,
-    }
-    return render(request, 'music/index.html', context)
+class MusicMenuMixin:
+    page_title = ''
+
+    def get_page_title(self):
+        return getattr(self, 'page_title', '')
+
+    def get_menu(self):
+        return MENU
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.setdefault('menu', self.get_menu())
+        if 'title' not in context:
+            context['title'] = self.get_page_title()
+        return context
+
+
+class HomeTemplateView(MusicMenuMixin, TemplateView):
+    template_name = 'music/index.html'
+    page_title = 'Музыкальный каталог'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['description'] = 'Добро пожаловать в демо-каталог музыки. Выберите раздел, чтобы продолжить.'
+        context['sections'] = SECTIONS
+        return context
 
 
 def genres(request):
@@ -84,53 +104,117 @@ def genre_by_slug(request, genre_slug):
     )
 
 
-def tracks_list(request):
-    tracks = (
-        Track.objects.select_related('genre')
-        .prefetch_related('tags')
-        .filter(is_published=True)
-        .order_by('-release_year', 'title')
-    )
-    context = {
-        'title': 'Треки каталога',
-        'menu': MENU,
-        'tracks': tracks,
-    }
-    return render(request, 'music/tracks.html', context)
+class TrackListView(MusicMenuMixin, ListView):
+    model = Track
+    template_name = 'music/tracks.html'
+    context_object_name = 'tracks'
+    paginate_by = 6
+    page_title = 'Треки каталога'
+
+    def get_queryset(self):
+        return (
+            Track.objects.select_related('genre')
+            .prefetch_related('tags')
+            .filter(is_published=True)
+            .order_by('-release_year', 'title')
+        )
 
 
-def track_create(request):
-    if request.method == 'POST':
-        form = TrackForm(request.POST, request.FILES)
-        if form.is_valid():
-            track = form.save()
-            messages.success(request, f'Трек «{track.title}» успешно добавлен.')
-            return redirect('tracks_list')
-        messages.error(request, 'Исправьте ошибки в форме.')
-    else:
-        form = TrackForm()
-    context = {
-        'title': 'Добавить трек',
-        'menu': MENU,
-        'form': form,
-    }
-    return render(request, 'music/track_form.html', context)
+class TrackDetailView(MusicMenuMixin, DetailView):
+    model = Track
+    template_name = 'music/track_detail.html'
+    context_object_name = 'track'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+    page_title = 'Трек'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = self.object.title
+        return context
+
+    def get_queryset(self):
+        return Track.objects.select_related('genre').prefetch_related('tags')
 
 
-def track_suggestion(request):
-    form = TrackSuggestionForm(request.POST or None)
-    if request.method == 'POST':
-        if form.is_valid():
-            messages.success(request, 'Спасибо! Мы изучим вашу идею и добавим трек позже.')
-            form = TrackSuggestionForm()
-        else:
-            messages.error(request, 'Проверьте введённые данные.')
-    context = {
-        'title': 'Предложить трек',
-        'menu': MENU,
-        'form': form,
-    }
-    return render(request, 'music/track_suggestion.html', context)
+class TrackCreateView(MusicMenuMixin, CreateView):
+    template_name = 'music/track_form.html'
+    form_class = TrackForm
+    model = Track
+    success_url = reverse_lazy('tracks_list')
+    page_title = 'Добавить трек'
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Трек «{self.object.title}» успешно добавлен.')
+        return response
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Исправьте ошибки в форме.')
+        return super().form_invalid(form)
+
+
+class TrackUpdateView(MusicMenuMixin, UpdateView):
+    template_name = 'music/track_form.html'
+    form_class = TrackForm
+    model = Track
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+    success_url = reverse_lazy('tracks_list')
+    page_title = 'Редактировать трек'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Редактировать {self.object.title}'
+        return context
+
+    def form_valid(self, form):
+        response = super().form_valid(form)
+        messages.success(self.request, f'Трек «{self.object.title}» обновлён.')
+        return response
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Исправьте ошибки в форме.')
+        return super().form_invalid(form)
+
+
+class TrackDeleteView(MusicMenuMixin, DeleteView):
+    model = Track
+    template_name = 'music/track_confirm_delete.html'
+    slug_field = 'slug'
+    slug_url_kwarg = 'slug'
+    success_url = reverse_lazy('tracks_list')
+    page_title = 'Удалить трек'
+
+    def delete(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        messages.success(request, f'Трек «{self.object.title}» удалён.')
+        return super().delete(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = f'Удалить {self.object.title}'
+        return context
+
+
+class TrackSuggestionView(MusicMenuMixin, FormView):
+    template_name = 'music/track_suggestion.html'
+    form_class = TrackSuggestionForm
+    success_url = reverse_lazy('track_suggestion')
+    page_title = 'Предложить трек'
+
+    def form_valid(self, form):
+        messages.success(self.request, 'Спасибо! Мы изучим вашу идею и добавим трек позже.')
+        return super().form_valid(form)
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Проверьте введённые данные.')
+        return super().form_invalid(form)
+
+
+class TrackPingView(View):
+    def get(self, request, *args, **kwargs):
+        return HttpResponse('ok')
 
 
 def tracks_demo_orm(request):
@@ -198,6 +282,13 @@ def tracks_demo_orm(request):
         [:3]
     )
 
+    selection_examples = {
+        'first_track': Track.objects.order_by('title').first(),
+        'last_track': Track.objects.order_by('title').last(),
+        'total_tracks': Track.objects.count(),
+        'has_unpublished': Track.objects.filter(is_published=False).exists(),
+    }
+
     context = {
         'title': 'Демо ORM по трекам',
         'menu': MENU,
@@ -208,6 +299,7 @@ def tracks_demo_orm(request):
         'track_stats': track_stats,
         'genre_groups': genre_groups,
         'duration_minutes': duration_minutes,
+        'selection_examples': selection_examples,
     }
     return render(request, 'music/tracks_demo.html', context)
 
@@ -276,3 +368,4 @@ def add_artist(request):
 def old_genres(request):
     genres_url = reverse('genres_list')
     return redirect(genres_url)
+

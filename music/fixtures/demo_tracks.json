@@ -1,0 +1,170 @@
+[
+  {
+    "model": "music.track",
+    "pk": 5,
+    "fields": {
+      "title": "Stairway to Heaven",
+      "slug": "demo-track-01",
+      "duration": 200,
+      "release_year": 2018,
+      "play_count": 100,
+      "is_published": true,
+      "genre": 1,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 6,
+    "fields": {
+      "title": "Hotel California",
+      "slug": "demo-track-02",
+      "duration": 210,
+      "release_year": 2019,
+      "play_count": 120,
+      "is_published": true,
+      "genre": 2,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 7,
+    "fields": {
+      "title": "Smells Like Teen Spirit",
+      "slug": "demo-track-03",
+      "duration": 220,
+      "release_year": 2020,
+      "play_count": 130,
+      "is_published": true,
+      "genre": 3,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 8,
+    "fields": {
+      "title": "Sweet Child O' Mine",
+      "slug": "demo-track-04",
+      "duration": 230,
+      "release_year": 2021,
+      "play_count": 140,
+      "is_published": true,
+      "genre": 4,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 9,
+    "fields": {
+      "title": "Billie Jean",
+      "slug": "demo-track-05",
+      "duration": 240,
+      "release_year": 2017,
+      "play_count": 150,
+      "is_published": true,
+      "genre": 1,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 10,
+    "fields": {
+      "title": "Wonderwall",
+      "slug": "demo-track-06",
+      "duration": 250,
+      "release_year": 2016,
+      "play_count": 160,
+      "is_published": true,
+      "genre": 2,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 11,
+    "fields": {
+      "title": "Imagine",
+      "slug": "demo-track-07",
+      "duration": 260,
+      "release_year": 2015,
+      "play_count": 170,
+      "is_published": true,
+      "genre": 3,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 12,
+    "fields": {
+      "title": "Losing My Religion",
+      "slug": "demo-track-08",
+      "duration": 270,
+      "release_year": 2014,
+      "play_count": 180,
+      "is_published": true,
+      "genre": 4,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 13,
+    "fields": {
+      "title": "Back in Black",
+      "slug": "demo-track-09",
+      "duration": 280,
+      "release_year": 2013,
+      "play_count": 190,
+      "is_published": true,
+      "genre": 1,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 14,
+    "fields": {
+      "title": "Californication",
+      "slug": "demo-track-10",
+      "duration": 290,
+      "release_year": 2012,
+      "play_count": 200,
+      "is_published": true,
+      "genre": 2,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 15,
+    "fields": {
+      "title": "Clocks",
+      "slug": "demo-track-11",
+      "duration": 300,
+      "release_year": 2011,
+      "play_count": 210,
+      "is_published": true,
+      "genre": 3,
+      "tags": []
+    }
+  },
+  {
+    "model": "music.track",
+    "pk": 16,
+    "fields": {
+      "title": "Thunderstruck",
+      "slug": "demo-track-12",
+      "duration": 310,
+      "release_year": 2010,
+      "play_count": 220,
+      "is_published": true,
+      "genre": 4,
+      "tags": []
+    }
+  }
+]
