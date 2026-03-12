@@ -7,8 +7,45 @@
         <img src="{{ track.image.url }}" alt="{{ track.title }}" style="max-width:320px;height:auto;border-radius:4px;">
     {% endif %}
     <p>Жанр: {{ track.genre.name }}</p>
+    <p>
+        Автор:
+        {% if track.author %}
+            {% with full_name=track.author.get_full_name %}
+                {% if full_name %}
+                    {{ full_name }}
+                {% else %}
+                    {{ track.author.username }}
+                {% endif %}
+            {% endwith %}
+        {% else %}
+            не указан
+        {% endif %}
+    </p>
     <p>Длительность: {{ track.duration }} сек • Год: {{ track.release_year }}</p>
     <p>Прослушиваний: {{ track.play_count }}</p>
+    {% if user.is_authenticated %}
+        {% if user == track.author or user.is_staff or user.is_superuser %}
+            <p class="track-actions">
+                <a href="{% url 'track_update' track.slug %}">Редактировать</a> |
+                <a href="{% url 'track_delete' track.slug %}">Удалить</a>
+            </p>
+        {% endif %}
+    {% endif %}
+    <div class="track-likes">
+        <strong>Лайков: {{ likes_count }}</strong>
+        {% if user.is_authenticated %}
+            <form method="post" action="{% url 'track_like_toggle' track.slug %}" style="display:inline-block;margin-left:12px;">
+                {% csrf_token %}
+                <button type="submit">
+                    {% if has_liked %}Убрать лайк{% else %}Лайк{% endif %}
+                </button>
+            </form>
+        {% else %}
+            <span style="margin-left:12px;">
+                <a href="{% url 'login' %}?next={{ request.path }}">Войдите</a>, чтобы поставить лайк.
+            </span>
+        {% endif %}
+    </div>
     <section>
         <strong>Теги:</strong>
         <ul>
@@ -20,4 +57,55 @@
         </ul>
     </section>
 </article>
+
+<section class="track-comments">
+    <h3>Комментарии</h3>
+    {% if comments %}
+        <ul class="comments-list">
+            {% for comment in comments %}
+                <li>
+                    <div class="comment-meta">
+                        <strong>
+                            {% if comment.author %}
+                                {% with full_name=comment.author.get_full_name %}
+                                    {% if full_name %}
+                                        {{ full_name }}
+                                    {% else %}
+                                        {{ comment.author.username }}
+                                    {% endif %}
+                                {% endwith %}
+                            {% else %}
+                                Аноним
+                            {% endif %}
+                        </strong>
+                        <span>{{ comment.created_at|date:"d.m.Y H:i" }}</span>
+                    </div>
+                    <p>{{ comment.text|linebreaksbr }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Пока нет комментариев.</p>
+    {% endif %}
+
+    <div class="comment-form">
+        {% if user.is_authenticated %}
+            <h4>Оставить комментарий</h4>
+            <form method="post">
+                {% csrf_token %}
+                {{ comment_form.non_field_errors }}
+                <div>
+                    {{ comment_form.text.label_tag }}
+                    {{ comment_form.text }}
+                    {% for error in comment_form.text.errors %}
+                        <p class="error">{{ error }}</p>
+                    {% endfor %}
+                </div>
+                <button type="submit">Отправить</button>
+            </form>
+        {% else %}
+            <p>Чтобы оставить комментарий, <a href="{% url 'login' %}?next={{ request.path }}">войдите в аккаунт</a>.</p>
+        {% endif %}
+    </div>
+</section>
 {% endblock %}

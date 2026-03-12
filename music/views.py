@@ -7,8 +7,8 @@ from django.urls import reverse, reverse_lazy
 from django.views import View
 from django.views.generic import CreateView, DeleteView, DetailView, FormView, ListView, TemplateView, UpdateView
 
-from .forms import TrackForm, TrackSuggestionForm
-from .models import Genre, GenreAudience, Track
+from .forms import CommentForm, TrackForm, TrackSuggestionForm
+from .models import Genre, GenreAudience, Track, TrackLike
 
 MENU = [
     {'title': 'Главная', 'url_name': 'home'},
@@ -114,7 +114,7 @@ class TrackListView(MusicMenuMixin, ListView):
 
     def get_queryset(self):
         return (
-            Track.objects.select_related('genre')
+            Track.objects.select_related('genre', 'author')
             .prefetch_related('tags')
             .filter(is_published=True)
             .order_by('-release_year', 'title')
@@ -128,14 +128,54 @@ class TrackDetailView(MusicMenuMixin, DetailView):
     slug_field = 'slug'
     slug_url_kwarg = 'slug'
     page_title = 'Трек'
+    comment_form_class = CommentForm
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = self.object.title
+        context['comments'] = self.object.comments.select_related('author')
+        context['likes_count'] = self.object.likes.count()
+        context['has_liked'] = (
+            self.request.user.is_authenticated
+            and self.object.likes.filter(user=self.request.user).exists()
+        )
+        if 'comment_form' not in context:
+            context['comment_form'] = self.comment_form_class() if self.request.user.is_authenticated else None
         return context
 
     def get_queryset(self):
-        return Track.objects.select_related('genre').prefetch_related('tags')
+        return (
+            Track.objects.select_related('genre', 'author')
+            .prefetch_related('tags', 'comments__author', 'likes')
+        )
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        detail_url = reverse('track_detail', kwargs={'slug': self.object.slug})
+        if not request.user.is_authenticated:
+            return redirect(f"{reverse('login')}?next={detail_url}")
+        form = self.comment_form_class(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.author = request.user
+            comment.track = self.object
+            comment.save()
+            messages.success(request, 'Комментарий добавлен.')
+            return redirect(detail_url)
+        context = self.get_context_data(comment_form=form)
+        return self.render_to_response(context)
+
+
+class TrackLikeToggleView(LoginRequiredMixin, View):
+    def post(self, request, *args, **kwargs):
+        track = get_object_or_404(Track, slug=kwargs['slug'])
+        like, created = TrackLike.objects.get_or_create(track=track, user=request.user)
+        if created:
+            messages.success(request, 'Трек добавлен в понравившиеся.')
+        else:
+            like.delete()
+            messages.info(request, 'Лайк удалён.')
+        return redirect(track.get_absolute_url())
 
 
 class TrackCreateView(LoginRequiredMixin, PermissionRequiredMixin, MusicMenuMixin, CreateView):
@@ -147,6 +187,7 @@ class TrackCreateView(LoginRequiredMixin, PermissionRequiredMixin, MusicMenuMixi
     permission_required = 'music.can_publish_track'
 
     def form_valid(self, form):
+        form.instance.author = self.request.user
         response = super().form_valid(form)
         messages.success(self.request, f'Трек «{self.object.title}» успешно добавлен.')
         return response
@@ -165,6 +206,13 @@ class TrackUpdateView(LoginRequiredMixin, PermissionRequiredMixin, MusicMenuMixi
     success_url = reverse_lazy('tracks_list')
     page_title = 'Редактировать трек'
     permission_required = 'music.change_track'
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return base_qs
+        return base_qs.filter(author=user)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -189,6 +237,13 @@ class TrackDeleteView(LoginRequiredMixin, PermissionRequiredMixin, MusicMenuMixi
     success_url = reverse_lazy('tracks_list')
     page_title = 'Удалить трек'
     permission_required = 'music.delete_track'
+
+    def get_queryset(self):
+        base_qs = super().get_queryset()
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return base_qs
+        return base_qs.filter(author=user)
 
     def delete(self, request, *args, **kwargs):
         self.object = self.get_object()

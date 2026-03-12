@@ -1,7 +1,7 @@
 ﻿from django.contrib import admin
 from django.utils.html import mark_safe
 
-from .models import Genre, Tag, Track, TrackDetails
+from .models import Comment, Genre, Tag, Track, TrackDetails, TrackLike
 
 
 admin.site.site_header = 'Музыкальный каталог — администрирование'
@@ -46,6 +46,7 @@ class TagAdmin(admin.ModelAdmin):
 class TrackAdmin(admin.ModelAdmin):
     list_display = (
         'title',
+        'author',
         'genre',
         'release_year',
         'duration',
@@ -57,13 +58,13 @@ class TrackAdmin(admin.ModelAdmin):
     )
     list_editable = ('play_count', 'is_published')
     list_filter = ('is_published', 'genre', 'release_year', HasDetailsFilter)
-    search_fields = ('title', 'slug')
+    search_fields = ('title', 'slug', 'author__username', 'author__email')
     ordering = ('-release_year', 'title')
     prepopulated_fields = {'slug': ('title',)}
     filter_horizontal = ('tags',)
     actions = ('mark_published', 'reset_play_count')
     fieldsets = (
-        ('Основная информация', {'fields': ('title', 'slug', 'genre', 'tags')}),
+        ('Основная информация', {'fields': ('title', 'slug', 'genre', 'author', 'tags')}),
         (
             'Параметры трека',
             {
@@ -118,3 +119,19 @@ class TrackAdmin(admin.ModelAdmin):
 @admin.register(TrackDetails)
 class TrackDetailsAdmin(admin.ModelAdmin):
     list_display = ('track', 'lyrics_author', 'bpm', 'has_video')
+
+
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    list_display = ('track', 'author', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('track__title', 'author__username', 'author__email', 'text')
+    readonly_fields = ('created_at',)
+
+
+@admin.register(TrackLike)
+class TrackLikeAdmin(admin.ModelAdmin):
+    list_display = ('track', 'user', 'created_at')
+    list_filter = ('created_at',)
+    search_fields = ('track__title', 'user__username', 'user__email')
+    readonly_fields = ('created_at',)

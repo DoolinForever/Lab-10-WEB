@@ -1,6 +1,8 @@
 ﻿import os
 import uuid
+from django.conf import settings
 from django.db import models
+from django.urls import reverse
 
 
 class GenreAudience(models.TextChoices):
@@ -65,6 +67,14 @@ class Track(models.Model):
     genre = models.ForeignKey(Genre, on_delete=models.CASCADE, related_name='tracks')
     tags = models.ManyToManyField(Tag, related_name='tracks', blank=True)
     image = models.ImageField(upload_to=track_image_upload_to, blank=True, null=True)
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='tracks',
+        verbose_name='автор',
+    )
 
     class Meta:
         ordering = ['-release_year', 'title']
@@ -76,6 +86,9 @@ class Track(models.Model):
 
     def __str__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('track_detail', kwargs={'slug': self.slug})
 
 
 class TrackDetails(models.Model):
@@ -90,3 +103,47 @@ class TrackDetails(models.Model):
 
     def __str__(self):
         return f'Детали {self.track.title}'
+
+
+class Comment(models.Model):
+    track = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='track_comments',
+        verbose_name='автор',
+    )
+    text = models.TextField('Комментарий')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'комментарий'
+        verbose_name_plural = 'комментарии'
+
+    def __str__(self):
+        author = self.author or 'Аноним'
+        return f'Комментарий от {author} к {self.track}'
+
+
+class TrackLike(models.Model):
+    track = models.ForeignKey(Track, on_delete=models.CASCADE, related_name='likes', verbose_name='трек')
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='track_likes',
+        verbose_name='пользователь',
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = 'лайк трека'
+        verbose_name_plural = 'лайки треков'
+        constraints = [
+            models.UniqueConstraint(fields=['track', 'user'], name='unique_track_user_like'),
+        ]
+
+    def __str__(self):
+        return f'Лайк {self.user} → {self.track}'

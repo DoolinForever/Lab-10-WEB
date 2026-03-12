@@ -2,7 +2,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 
-from .models import Track
+from .models import Comment, Track
 
 FORBIDDEN_WORDS = {'спам', 'запрещено', 'test'}
 
@@ -59,3 +59,19 @@ class TrackForm(forms.ModelForm):
         if duration < 30:
             raise ValidationError('Длительность трека должна быть больше 30 секунд.')
         return duration
+
+
+class CommentForm(forms.ModelForm):
+    class Meta:
+        model = Comment
+        fields = ['text']
+        labels = {'text': 'Комментарий'}
+        widgets = {
+            'text': forms.Textarea(attrs={'rows': 3, 'placeholder': 'Поделитесь впечатлением...'}),
+        }
+
+    def clean_text(self):
+        text = self.cleaned_data['text'].strip()
+        if not text:
+            raise ValidationError('Комментарий не может быть пустым.')
+        return text

@@ -10,6 +10,14 @@
             {% endif %}
             <h3><a href="{% url 'track_detail' track.slug %}">{{ track.title }}</a></h3>
             <p>Жанр: {{ track.genre.name }}</p>
+            <p>
+                Автор:
+                {% if track.author %}
+                    {{ track.author.get_full_name|default:track.author.username }}
+                {% else %}
+                    Не указан
+                {% endif %}
+            </p>
             <p>Длительность: {{ track.duration }} сек • Год: {{ track.release_year }}</p>
             <div>
                 <strong>Теги:</strong>

@@ -17,6 +17,7 @@ urlpatterns = [
     path('tracks/demo-orm/', views.tracks_demo_orm, name='tracks_demo'),
     path('tracks/<slug:slug>/edit/', views.TrackUpdateView.as_view(), name='track_update'),
     path('tracks/<slug:slug>/delete/', views.TrackDeleteView.as_view(), name='track_delete'),
+    path('tracks/<slug:slug>/like/', views.TrackLikeToggleView.as_view(), name='track_like_toggle'),
     path('tracks/<slug:slug>/', views.TrackDetailView.as_view(), name='track_detail'),
     path('genres/demo-orm/', views.genres_demo_orm, name='genres_demo'),
     path('genres/<int:genre_id>/', views.genre_by_id, name='genre_by_id'),
